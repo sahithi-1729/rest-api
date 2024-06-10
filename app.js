@@ -63,6 +63,8 @@ app.patch('/api/v1/movies/:id',(req,res)=>{
 
 })
 
+
+
 //using multiple route parameters and use ? to make it optional
 // app.get('/api/v1/movies/:id/:name/:x?',(req,res)=>{
 //     console.log(req.params);
