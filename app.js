@@ -93,6 +93,37 @@ app.post('/api/v1/movies',(req,res)=>{
     //res.send("Created");
 })
 
+
+//delete 
+app.delete('/api/v1/movies/:id',(req,res)=>{
+    const id = req.params.id*1;
+    const movieToDelete = movies.find(el=>el.id===id);
+
+
+    if(!movieToDelete){
+        return res.status(404).json({
+            status: 'fail',
+            message: 'Movie not found'
+        })
+    }
+    const index = movies.indexOf(movieToDelete);
+
+
+
+    movies.splice(index,1);
+    fs.writeFile('./data/movies.json',JSON.stringify(movies),(err)=>{
+        res.status(204).json({
+            status:"Success",
+            data:{
+                movie: null
+            }
+        })
+    })
+})
+
 app.listen(port,()=>{
     console.log("Server is running");
 })
+
+
+//watch 38th video of procademy to understand how to refactor the code :)
