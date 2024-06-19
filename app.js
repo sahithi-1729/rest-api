@@ -3,7 +3,7 @@ const fs = require('fs');
 const morgan = require('morgan')
 const moviesRouter = require('./Routes/moviesRoutes')
 
-let movies = JSON.parse(fs.readFileSync('./data/movies.json'));
+let movies = JSON.parse(fs.readFileSync('./data/movies.json'));//JSON to js object
 
 let app = express();
 const port = 3000;

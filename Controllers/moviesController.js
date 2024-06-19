@@ -2,6 +2,20 @@ const fs = require('fs');
 
 let movies = JSON.parse(fs.readFileSync('./data/movies.json'));
 
+exports.checkId = (req,res,next,value) =>{
+    console.log('Movie ID is' + value);
+    let movie = movies.find(el=>el.id === value*1 );
+
+    if(!movie){
+        return res.status(404).json({
+            status: 'fail',
+            message: 'Movie not found'
+        })
+    }
+
+    next();
+}
+
 exports.getAllMovies = (req,res)=>{
     res.status(200).json({            //json - JSEND json data formatting
         status:"success",
@@ -15,15 +29,8 @@ exports.getAllMovies = (req,res)=>{
 exports.getMovie = (req,res)=>{
     console.log(req.params);
     const id = req.params.id * 1;
-    let movie = movies.find(el=>el.id === id
-    )
-
-    if(!movie){
-        return res.status(404).json({
-            status: 'fail',
-            message: 'Movie not found'
-        })
-    }
+    let movie = movies.find(el=>el.id === id )
+    
     res.status(200).json({
         status: "success",
         data : {
@@ -75,12 +82,12 @@ exports.deleteMovie = (req,res)=>{
     const movieToDelete = movies.find(el=>el.id===id);
 
 
-    if(!movieToDelete){
-        return res.status(404).json({
-            status: 'fail',
-            message: 'Movie not found'
-        })
-    }
+    // if(!movieToDelete){
+    //     return res.status(404).json({
+    //         status: 'fail',
+    //         message: 'Movie not found'
+    //     })
+    // }
     const index = movies.indexOf(movieToDelete);
 
 
