@@ -8,7 +8,7 @@ Router.param('id',moviesController.checkId
 )
 Router.route('/')
     .get(moviesController.getAllMovies)
-    .post(moviesController.createMovie)
+    .post(moviesController.validateBody,moviesController.createMovie)//chaining of middlewares
 
 Router.route('/:id')
     .get(moviesController.getMovie)
