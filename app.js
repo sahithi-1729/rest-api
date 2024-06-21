@@ -16,8 +16,10 @@ const logger = function(req,res,next){
 }
 
 app.use(express.json()) //middleware
-app.use(morgan('dev'))//we are using () after invoking middlewares bcz they are going to return a function which is a
+if(process.env.NODE_ENV==='development'){
+    app.use(morgan('dev'))//we are using () after invoking middlewares bcz they are going to return a function which is a
 //middleware while logger is the middlware itself
+}
 app.use(express.static('./public'))
 app.use(logger) //app.use() to use any middleware 
 
