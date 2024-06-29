@@ -3,9 +3,8 @@ const moviesController = require('../Controllers/moviesController')
 
 const Router = express.Router();
 
-Router.param('id',moviesController.checkId
-    
-)
+// Router.param('id',moviesController.checkId)
+
 Router.route('/')
     .get(moviesController.getAllMovies)
     .post(moviesController.validateBody,moviesController.createMovie)//chaining of middlewares
