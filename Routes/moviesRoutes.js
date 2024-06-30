@@ -7,7 +7,7 @@ const Router = express.Router();
 
 Router.route('/')
     .get(moviesController.getAllMovies)
-    .post(moviesController.validateBody,moviesController.createMovie)//chaining of middlewares
+    .post(moviesController.createMovie)//chaining of middlewares
 
 Router.route('/:id')
     .get(moviesController.getMovie)

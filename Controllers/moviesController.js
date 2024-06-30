@@ -17,17 +17,17 @@ const Movie = require('./../Models/movieModel')
     // next();
 // }
 
-exports.validateBody = (req,res,next) =>{
-    if(!req.body.name || !req.body.releaseYear){
-        return res.status(400).json({
-            status : "fail",
-            message : "Body is not present in the request"
-        })
-    }
-    next();
-}
+// exports.validateBody = (req,res,next) =>{
+//     if(!req.body.name || !req.body.releaseYear){
+//         return res.status(400).json({
+//             status : "fail",
+//             message : "Body is not present in the request"
+//         })
+//     }
+//     next();
+// }
 
-exports.getAllMovies = (req,res)=>{
+exports.getAllMovies = async (req,res)=>{
     // res.status(200).json({            //json - JSEND json data formatting
     //     status:"success",
     //     count : movies.length,
@@ -35,9 +35,26 @@ exports.getAllMovies = (req,res)=>{
     //         movies:movies
     //     }
     // })
+
+    try{
+        const allMovies = await Movie.find();
+        res.status(200).json({
+            status:'success',
+            length : allMovies.length,
+            data : {
+                allMovies
+            }
+        })
+    }
+    catch(err){
+        res.status(400).json({
+            status:'fail',
+            message:err.message
+        })
+    }
 }
 
-exports.getMovie = (req,res)=>{
+exports.getMovie = async (req,res)=>{
     // console.log(req.params);
     // const id = req.params.id * 1;
     // let movie = movies.find(el=>el.id === id )
@@ -48,10 +65,27 @@ exports.getMovie = (req,res)=>{
     //         movie : movie
     //     }
     // })
-
+    
+    try{
+        const movie = await Movie.find({_id:req.params.id}) 
+        //const movie = await Movie.findById(req.params.id)
+        res.status(200).json({
+            status:'success',
+            
+            data : {
+                movie
+            }
+        })
+    }
+    catch(err){
+        res.status(400).json({
+            status:'fail',
+            message:"movie not found"
+        })
+    }
 }
 
-exports.updateMovie = (req,res)=>{
+exports.updateMovie = async (req,res)=>{
     // let id = req.params.id*1;
     // let movieToUpdate = movies.find(el=>el.id===id)
     // // let index = movies.indexOf(movieToUpdate)
@@ -67,10 +101,24 @@ exports.updateMovie = (req,res)=>{
     //         }
     //     })
     // })
-
+    try {
+        const updatedMovie = await Movie.findByIdAndUpdate(req.params.id,req.body,{new:true,runValidators:true})
+        res.status(200).json({
+            status:'success',
+            
+            data : {
+                updatedMovie
+            }
+        })
+    } catch (error) {
+        res.status(400).json({
+            status:'fail',
+            message:"movie not found"
+        })
+    }
 }
 
-exports.createMovie = (req,res)=>{
+exports.createMovie = async (req,res)=>{
     // const newId = movies[movies.length-1].id + 1;
     // console.log(req.body);
     // const newMovie = Object.assign({id:newId},req.body)
@@ -86,9 +134,40 @@ exports.createMovie = (req,res)=>{
     //     })
     // })
     //res.send("Created");
+
+    //**creating document using Movie model */
+    // const testMovie = new Movie({});
+    // testMovie.save()
+
+
+    /**Creating document using create and using resolving promise using then and catch */
+    // Movie.create({})
+    // .then(doc => {
+    //     console.log(doc);
+    // })
+    // .catch(err => console.log(err));
+
+
+    /**Creating document using create and using resolving promise using aync and await */
+    try{
+        const movie = await Movie.create(req.body);
+
+        res.status(201).json({
+            status: 'success',
+            data : {
+                movie
+            }
+        })
+    }
+    catch(err){
+        res.status(400).json({
+            status:'fail',
+            message: err.message
+        })
+    }    
 }
 
-exports.deleteMovie = (req,res)=>{
+exports.deleteMovie = async (req,res)=>{
     // const id = req.params.id*1;
     // const movieToDelete = movies.find(el=>el.id===id);
 
@@ -112,5 +191,17 @@ exports.deleteMovie = (req,res)=>{
     //         }
     //     })
     // })
+
+    try {
+        const deleteMovie = await Movie.findByIdAndDelete(req.params.id)
+        res.status(204).json({
+            status: 'success'
+        })
+    } catch (error) {
+        res.status(400).json({
+            status:'fail',
+            message: err.message
+        })
+    }
 }
 
