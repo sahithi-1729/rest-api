@@ -21,7 +21,7 @@ mongoose.connect(process.env.CONN_STR,{
 
 
 //console.log(app.get('env'));//env is a environment variable by express.js
-console.log(process.env)//process is core module of node.js
+//console.log(process.env)//process is core module of node.js
 
 
 app.listen(port,()=>{

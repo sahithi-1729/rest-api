@@ -15,6 +15,8 @@ const logger = function(req,res,next){
     next()
 }
 
+
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json()) //middleware
 if(process.env.NODE_ENV==='development'){
     app.use(morgan('dev'))//we are using () after invoking middlewares bcz they are going to return a function which is a

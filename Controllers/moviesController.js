@@ -37,10 +37,23 @@ exports.getAllMovies = async (req,res)=>{
     // })
 
     try{
-        console.log(req.query)
         //implementing filtering 
         // const allMovies = await Movie.find({duration: req.query.duration*1,ratings:req.query.ratings*1});
-        const allMovies = await Movie.find(req.query);
+
+        //*For mongoose 6.0 or below*{
+        // const excludeFields  = ['sort','page','limit','fields'];
+
+        // const queryObj = {...req.query};//shallow copy using spread operator  ---- for deep copy "const queryObj = req.query" 
+
+        // excludeFields.forEach((el) => {
+        //     delete queryObj[el]
+        // })
+
+        // console.log(req.query)
+        // console.log(queryObj)
+       // const allMovies = await Movie.find(queryObj);}
+
+       
 
         //using mongoose functions
         // const allMovies = await Movie.find(req.query)
@@ -48,6 +61,37 @@ exports.getAllMovies = async (req,res)=>{
         //                         .equals(req.query.duration)
         //                         .where('ratings')
         //                         .equals(req.query.ratings)
+
+
+        let queryStr = JSON.stringify(req.query);
+        queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g,(match)=>`$${match}`);
+        const queryObj = JSON.parse(queryStr);
+        //console.log(queryObj);
+        delete queryObj.sort
+        delete queryObj.fields
+        let query =  Movie.find(queryObj);
+        //find({duration:{$gte:90},ratings:{$gte:5},price:{$lte:100}})
+
+        //Sorting logic
+        if(req.query.sort){
+            const sortBy = req.query.sort.split(',').join(' ')
+            //console.log(sortBy)
+            query = query.sort(sortBy)
+        }
+        else{
+            query = query.sort('-createdAt')
+        }
+
+        //LIMITING FIELDS
+        if(req.query.fields){
+            const queryFields = req.query.fields.split(',').join(' ');
+            query = query.select(queryFields)
+        }
+        else{
+            query = query.select('-__v')
+        }
+
+        const allMovies = await query
         res.status(200).json({
             status:'success',
             length : allMovies.length,
