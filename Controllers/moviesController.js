@@ -37,7 +37,17 @@ exports.getAllMovies = async (req,res)=>{
     // })
 
     try{
-        const allMovies = await Movie.find();
+        console.log(req.query)
+        //implementing filtering 
+        // const allMovies = await Movie.find({duration: req.query.duration*1,ratings:req.query.ratings*1});
+        const allMovies = await Movie.find(req.query);
+
+        //using mongoose functions
+        // const allMovies = await Movie.find(req.query)
+        //                         .where('duration')
+        //                         .equals(req.query.duration)
+        //                         .where('ratings')
+        //                         .equals(req.query.ratings)
         res.status(200).json({
             status:'success',
             length : allMovies.length,
