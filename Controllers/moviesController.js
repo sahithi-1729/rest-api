@@ -278,7 +278,7 @@ exports.deleteMovie = async (req,res)=>{
         res.status(204).json({
             status: 'success'
         })
-    } catch (error) {
+    } catch (err) {
         res.status(400).json({
             status:'fail',
             message: err.message
@@ -288,3 +288,32 @@ exports.deleteMovie = async (req,res)=>{
 
 
 
+exports.getMovieStats = async (req,res) => {
+    try {
+        const stats  = await Movie.aggregate([
+            { $match : {ratings: {$gt:4.5}}},//stage1 - match
+            { $group : {
+                _id : '$releaseYear',
+                avgRatings : {$avg : '$ratings'},
+                avgPrice : {$avg : '$price'},
+                minPrice : {$min : '$price'},
+                maxPrice : {$max : '$price'},
+                totalPrice : {$sum : '$price'},
+                movieCount : {$sum : 1}
+            }},//stage2 - group 
+            { $sort : {minPrice:1}},
+            { $match : {maxPrice : {$gte:10}}}
+            
+        ])
+        res.status(201).json({
+            status: 'success',
+            stats
+        })
+        
+    } catch (err) {
+        res.status(400).json({
+            status:'fail',
+            message: err.message
+        })
+    }
+}
