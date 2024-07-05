@@ -1,5 +1,14 @@
 // const fs = require('fs');
 const Movie = require('./../Models/movieModel')
+const ApiFeatures = require('./../Utils/ApiFeatures')
+
+exports.getHighestRated = (req,res,next)=>{
+
+        req.query.limit = '5';
+        req.query.sort = '-ratings';
+
+        next();
+}
 
 // let movies = JSON.parse(fs.readFileSync('./data/movies.json'));
 
@@ -37,6 +46,8 @@ exports.getAllMovies = async (req,res)=>{
     // })
 
     try{
+        const features  = new ApiFeatures(Movie.find(),req.query).filter().sort().limitFields().paginate();
+        let query = await features.query
         //implementing filtering 
         // const allMovies = await Movie.find({duration: req.query.duration*1,ratings:req.query.ratings*1});
 
@@ -63,49 +74,49 @@ exports.getAllMovies = async (req,res)=>{
         //                         .equals(req.query.ratings)
 
 
-        let queryStr = JSON.stringify(req.query);
-        queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g,(match)=>`$${match}`);
-        const queryObj = JSON.parse(queryStr);
+        // let queryStr = JSON.stringify(req.query);
+        // queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g,(match)=>`$${match}`);
+        // const queryObj = JSON.parse(queryStr);
         //console.log(queryObj);
-        delete queryObj.sort
-        delete queryObj.fields
-        delete queryObj.page
-        delete queryObj.limit
-        let query =  Movie.find(queryObj);
+        // delete queryObj.sort
+        // delete queryObj.fields
+        // delete queryObj.page
+        // delete queryObj.limit
+        // let query =  Movie.find(queryObj);
         //find({duration:{$gte:90},ratings:{$gte:5},price:{$lte:100}})
 
         //Sorting logic
-        if(req.query.sort){
-            const sortBy = req.query.sort.split(',').join(' ')
-            //console.log(sortBy)
-            query = query.sort(sortBy)
-        }
-        else{
-            query = query.sort('-name')
-        }
+        // if(req.query.sort){
+        //     const sortBy = req.query.sort.split(',').join(' ')
+        //     //console.log(sortBy)
+        //     query = query.sort(sortBy)
+        // }
+        // else{
+        //     query = query.sort('-name')
+        // }
 
         //LIMITING FIELDS
-        if(req.query.fields){
-            const queryFields = req.query.fields.split(',').join(' ');
-            query = query.select(queryFields)
-        }
-        else{
-            query = query.select('-__v')
-        }
+        // if(req.query.fields){
+        //     const queryFields = req.query.fields.split(',').join(' ');
+        //     query = query.select(queryFields)
+        // }
+        // else{
+        //     query = query.select('-__v')
+        // }
 
         //PAGINATION
-        const page = req.query.page*1 || 1
-        const limit = req.query.limit*1 || 10
-        //page 1 - 1:10 page 2-11:20
-        const skip = (page-1)*limit
-        query = query.skip(skip).limit(limit);
+        // const page = req.query.page*1 || 1
+        // const limit = req.query.limit*1 || 10
+        // //page 1 - 1:10 page 2-11:20
+        // const skip = (page-1)*limit
+        // query = query.skip(skip).limit(limit);
 
-        if(req.query.page){
-            const docCount  = await Movie.countDocuments();
-            if(skip>=docCount)  {
-                throw new error('This page is not found')
-            }
-        }
+        // if(req.query.page){
+        //     const docCount  = await Movie.countDocuments();
+        //     if(skip>=docCount)  {
+        //         throw new error('This page is not found')
+        //     }
+        // }
 
         const allMovies = await query
         res.status(200).json({
@@ -274,4 +285,6 @@ exports.deleteMovie = async (req,res)=>{
         })
     }
 }
+
+
 

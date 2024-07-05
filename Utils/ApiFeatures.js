@@ -1,0 +1,63 @@
+class ApiFeatures{
+    constructor(query,queryStr){
+        this.query = query;
+        this.queryStr = queryStr;
+    }
+
+    filter(){
+        let queryString = JSON.stringify(this.queryStr);
+        queryString = queryString.replace(/\b(gte|gt|lte|lt)\b/g,(match)=>`$${match}`);
+        const queryObj = JSON.parse(queryString);
+
+        delete queryObj.sort
+        delete queryObj.fields
+        delete queryObj.page
+        delete queryObj.limit
+        this.query =  this.query.find(queryObj);
+
+        return this;
+    }
+
+    sort(){
+        if(this.queryStr.sort){
+            const sortBy = this.queryStr.sort.split(',').join(' ')
+            //console.log(sortBy)
+            this.query = this.query.sort(sortBy)
+        }
+        else{
+            this.query = this.query.sort('-name')
+        }
+
+        return this;
+    }
+
+    limitFields(){
+        if(this.queryStr.fields){
+            const queryFields = this.queryStr.fields.split(',').join(' ');
+            this.query = this.query.select(queryFields)
+        }
+        else{
+            this.query = this.query.select('-__v')
+        }
+
+        return this
+    }
+
+    paginate(){
+        const page = this.queryStr.page*1 || 1
+        const limit = this.queryStr.limit*1 || 10
+        //page 1 - 1:10 page 2-11:20
+        const skip = (page-1)*limit
+        this.query = this.query.skip(skip).limit(limit);
+
+        // if(this.queryStr.page){
+        //     const docCount  = await Movie.countDocuments();
+        //     if(skip>=docCount)  {
+        //         throw new error('This page is not found')
+        //     }
+        // }
+        return this
+    }
+}
+
+module.exports = ApiFeatures

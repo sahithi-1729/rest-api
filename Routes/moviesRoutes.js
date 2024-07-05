@@ -5,6 +5,8 @@ const Router = express.Router();
 
 // Router.param('id',moviesController.checkId)
 
+Router.route('/HighestRated').get(moviesController.getHighestRated,moviesController.getAllMovies)
+
 Router.route('/')
     .get(moviesController.getAllMovies)
     .post(moviesController.createMovie)//chaining of middlewares
