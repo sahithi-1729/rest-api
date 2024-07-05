@@ -69,6 +69,8 @@ exports.getAllMovies = async (req,res)=>{
         //console.log(queryObj);
         delete queryObj.sort
         delete queryObj.fields
+        delete queryObj.page
+        delete queryObj.limit
         let query =  Movie.find(queryObj);
         //find({duration:{$gte:90},ratings:{$gte:5},price:{$lte:100}})
 
@@ -79,7 +81,7 @@ exports.getAllMovies = async (req,res)=>{
             query = query.sort(sortBy)
         }
         else{
-            query = query.sort('-createdAt')
+            query = query.sort('-name')
         }
 
         //LIMITING FIELDS
@@ -89,6 +91,20 @@ exports.getAllMovies = async (req,res)=>{
         }
         else{
             query = query.select('-__v')
+        }
+
+        //PAGINATION
+        const page = req.query.page*1 || 1
+        const limit = req.query.limit*1 || 10
+        //page 1 - 1:10 page 2-11:20
+        const skip = (page-1)*limit
+        query = query.skip(skip).limit(limit);
+
+        if(req.query.page){
+            const docCount  = await Movie.countDocuments();
+            if(skip>=docCount)  {
+                throw new error('This page is not found')
+            }
         }
 
         const allMovies = await query
