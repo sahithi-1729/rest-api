@@ -8,7 +8,7 @@ const Router = express.Router();
 Router.route('/HighestRated').get(moviesController.getHighestRated,moviesController.getAllMovies)
 
 Router.route('/MovieStats').get(moviesController.getMovieStats)
-
+Router.route('/moviebygenre/:genre').get(moviesController.getMovieByGenre)
 Router.route('/')
     .get(moviesController.getAllMovies)
     .post(moviesController.createMovie)//chaining of middlewares
