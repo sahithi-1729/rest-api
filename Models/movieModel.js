@@ -1,6 +1,6 @@
 
 const { default: mongoose } = require('mongoose');
-
+const fs = require('fs')
 
 //creating a schema
 
@@ -58,6 +58,9 @@ const movieSchema = new mongoose.Schema({
     price:{
         type:Number,
         required:true
+    },
+    createdBy:{
+        type: String
     }
 },{
     toJSON:{ virtuals:true},
@@ -66,6 +69,20 @@ const movieSchema = new mongoose.Schema({
 
 movieSchema.virtual('durationInHours').get(function(){
     return this.duration/60
+})
+
+//Mongodb middleware - document middleware
+movieSchema.pre('save',function(next){
+    this.createdBy = 'Sahithi'
+    next()
+})
+
+movieSchema.post('save',function(doc,next){
+    const content = `This document ${doc.name} has been created by ${doc.createdBy} \n`
+    fs.writeFileSync('./Log/log.txt',content,{flag:'a'},(err)=>{
+        console.log(err.message)
+    })
+    next()
 })
 //creating a model  movie-model movies-collection  *collection is always plural*
 const Movie = mongoose.model('Movie',movieSchema);
