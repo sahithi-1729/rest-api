@@ -59,6 +59,13 @@ const movieSchema = new mongoose.Schema({
         type:Number,
         required:true
     }
+},{
+    toJSON:{ virtuals:true},
+    toObject:{ virtuals:true}
+})
+
+movieSchema.virtual('durationInHours').get(function(){
+    return this.duration/60
 })
 //creating a model  movie-model movies-collection  *collection is always plural*
 const Movie = mongoose.model('Movie',movieSchema);

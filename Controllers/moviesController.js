@@ -287,7 +287,7 @@ exports.deleteMovie = async (req,res)=>{
 }
 
 
-
+//Aggregation Pipeline
 exports.getMovieStats = async (req,res) => {
     try {
         const stats  = await Movie.aggregate([
