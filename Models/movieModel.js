@@ -72,6 +72,7 @@ movieSchema.virtual('durationInHours').get(function(){
 })
 
 //Mongodb middleware - document middleware
+//in the document middleware "this" keyword points to the current document
 movieSchema.pre('save',function(next){
     this.createdBy = 'Sahithi'
     next()
@@ -84,6 +85,26 @@ movieSchema.post('save',function(doc,next){
     })
     next()
 })
+
+//MongoDb middleware - query middleware
+//in the query middleware "this" keyword points out to the current query obj
+movieSchema.pre(/^find/,function(next){
+    this.find({releaseDate:{$lte : Date.now()}})//return only released movies
+    this.startTime = Date.now();
+    next();
+})
+
+movieSchema.post(/^find/,function(docs,next){
+    
+    this.endTime = Date.now();
+    const execTime = this.endTime-this.startTime
+    const content = `Query took ${execTime} to complete its execution\n`
+    fs.writeFileSync('./Log/log.txt',content,{flag:'a'},(err)=>{
+        console.log('some error has occured')
+    })
+    next();
+})
+
 //creating a model  movie-model movies-collection  *collection is always plural*
 const Movie = mongoose.model('Movie',movieSchema);
 
