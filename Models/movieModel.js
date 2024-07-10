@@ -1,6 +1,7 @@
 
 const { default: mongoose } = require('mongoose');
 const fs = require('fs')
+const validator = require('validator')
 
 //creating a schema
 
@@ -9,7 +10,8 @@ const movieSchema = new mongoose.Schema({
         type: String,
         required: [true,'Name is required field'],
         unique:true,
-        trim : true
+        trim : true,
+        validate : [validator.isAlpha,"Name shoud only contain alphabets"]
     },
     description : {
         type:String,
@@ -22,7 +24,14 @@ const movieSchema = new mongoose.Schema({
     },
     ratings: {
         type: Number,
-        default: 1.0
+        default: 1.0,
+        //custom validator
+        validate : {
+            validator : function(ratings){
+                return ratings >=1 && ratings <=10
+            },
+            message : "{VALUE} is incorrect.Please input valid ratings "
+        }
     },
     totalRatings: {
         type:Number
@@ -94,8 +103,7 @@ movieSchema.pre(/^find/,function(next){
     next();
 })
 
-movieSchema.post(/^find/,function(docs,next){
-    
+movieSchema.post(/^find/,function(docs,next){  
     this.endTime = Date.now();
     const execTime = this.endTime-this.startTime
     const content = `Query took ${execTime} to complete its execution\n`
@@ -103,6 +111,11 @@ movieSchema.post(/^find/,function(docs,next){
         console.log('some error has occured')
     })
     next();
+})
+
+movieSchema.pre('aggregate',function(next){
+    //console.log(this)
+    this.pipeline.unshift({$match : {releaseDate : {$lte : new Date()}}})
 })
 
 //creating a model  movie-model movies-collection  *collection is always plural*
